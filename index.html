@@ -47,9 +47,14 @@
   <div class="foot">Herramienta local (best-effort). En certificados con formatos poco comunes, revisa el JSON antes de cargarlo. Motor: pdf.js + reglas del proyecto de migración CCS.</div>
 </main>
 
+<script>
+  // Mostrar cualquier error de carga/ejecucion en pantalla (para no quedar en blanco)
+  window.addEventListener('error', e=>{ const d=document.getElementById('lista'); if(d) d.innerHTML='<div class="alert">⚠️ Error: '+(e.message||e.error)+'</div>'+d.innerHTML; });
+  window.addEventListener('unhandledrejection', e=>{ const d=document.getElementById('lista'); if(d) d.innerHTML='<div class="alert">⚠️ Error: '+(e.reason&&e.reason.message||e.reason)+'</div>'+d.innerHTML; });
+</script>
 <script type="module">
-import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.mjs";
-pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
+import * as pdfjsLib from "./pdf.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "./pdf.worker.min.mjs";
 
 /* ===== Reconstruccion de layout desde pdf.js ===== */
 function reconstruir(items){
