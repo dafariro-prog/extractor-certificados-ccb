@@ -10,6 +10,7 @@
 
 import Anthropic from "./anthropic.min.mjs";
 import { normalizar, cobertura } from "./canonico.js";
+import { cargarReglas, bloquesSistema, mensajeCertificado } from "./prompt.js";
 
 export const MODELOS = {
   "claude-opus-5": { etiqueta: "Claude Opus 5 (maxima precision)", in: 5, out: 25 },
@@ -18,47 +19,12 @@ export const MODELOS = {
 
 const FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
-let REGLAS = null;
-
-/** Carga PROMPT_FINAL.md + tablas_codigos.md (mismo origen, sin CDN). */
-export async function cargarReglas() {
-  if (REGLAS) return REGLAS;
-  const [prompt, tablas] = await Promise.all([
-    fetch("./reglas/PROMPT_FINAL.md").then((r) => {
-      if (!r.ok) throw new Error("No se pudo cargar reglas/PROMPT_FINAL.md (" + r.status + ")");
-      return r.text();
-    }),
-    fetch("./reglas/tablas_codigos.md").then((r) => {
-      if (!r.ok) throw new Error("No se pudo cargar reglas/tablas_codigos.md (" + r.status + ")");
-      return r.text();
-    }),
-  ]);
-  REGLAS = { prompt, tablas };
-  return REGLAS;
-}
-
 function cliente(apiKey) {
   return new Anthropic({ apiKey, dangerouslyAllowBrowser: true, maxRetries: 3 });
 }
 
-const SALIDA = `
-## Formato de salida (obligatorio)
-
-Devuelve UNICAMENTE el objeto JSON canonico completo, sin markdown, sin \`\`\`, sin
-explicaciones y sin texto antes ni despues. Incluye SIEMPRE todas las claves de la
-estructura canonica, en el mismo orden; las que no apliquen van en null, [] o {}.
-No inventes datos que no esten en el certificado (regla 48).`;
-
-function bloquesSistema({ prompt, tablas }) {
-  // Prefijo estable -> se cachea y abarata cada certificado siguiente.
-  return [
-    { type: "text", text: prompt + "\n\n" + SALIDA },
-    { type: "text", text: tablas, cache_control: { type: "ephemeral" } },
-  ];
-}
-
 /** Extrae el primer objeto JSON balanceado del texto de respuesta. */
-function parseJSON(texto) {
+export function parseJSON(texto) {
   let t = (texto || "").trim();
   const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fence) t = fence[1].trim();
@@ -136,10 +102,7 @@ export async function extraerCertificado({ apiKey, texto, archivo, modelo = "cla
   const system = bloquesSistema(reglas);
   const uso = { entrada: 0, salida: 0 };
 
-  const peticion =
-    `Certificado a extraer. \`archivo_fuente\` = "${archivo}".\n` +
-    `Aplica las 68 reglas y devuelve el JSON canonico completo.\n\n` +
-    `<<<TEXTO_DEL_CERTIFICADO\n${texto}\nTEXTO_DEL_CERTIFICADO>>>`;
+  const peticion = mensajeCertificado(texto, archivo);
 
   onEstado("extrayendo (1/" + (auditar ? "2" : "1") + ")");
   let msg = await llamar(client, { modelo, system, messages: [{ role: "user", content: peticion }] });

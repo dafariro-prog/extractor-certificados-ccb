@@ -14,50 +14,84 @@
   main{max-width:1180px;margin:0 auto;padding:22px 24px;}
   fieldset{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:14px 16px;margin:0 0 18px}
   legend{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;padding:0 6px}
-  .cfg{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+  .modos{display:flex;gap:10px;flex-wrap:wrap}
+  .modo{flex:1;min-width:250px;background:#0b1220;border:1px solid var(--bord);border-radius:10px;padding:11px 13px;cursor:pointer;transition:.15s}
+  .modo:hover{border-color:#475569}
+  .modo.sel{border-color:var(--acc);background:#132132}
+  .modo b{display:block;font-size:13px;margin-bottom:3px}
+  .modo span{font-size:12px;color:var(--mut);line-height:1.45}
+  .modo .tag{display:inline-block;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+  .tag.g{background:#052e16;color:#4ade80;border:1px solid #166534}
+  .tag.a{background:#3b2c08;color:#fcd34d;border:1px solid #92400e}
+  .tag.r{background:#3b0d0d;color:#fca5a5;border:1px solid #7f1d1d}
+  .cfg{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)}
+  .cfg.oculto{display:none}
   .campo{display:flex;flex-direction:column;gap:5px}
   .campo label{font-size:12px;color:var(--mut)}
-  input[type=password],input[type=text],select{background:#0b1220;border:1px solid var(--bord);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;min-width:190px}
+  input[type=password],input[type=text],select,textarea{background:#0b1220;border:1px solid var(--bord);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
   input[type=password]{min-width:300px}
-  .chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--txt);padding-bottom:8px}
+  select{min-width:190px}
+  textarea{width:100%;min-height:190px;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5}
+  .chk{display:flex;align-items:center;gap:7px;font-size:13px;padding-bottom:8px}
   #drop{border:2px dashed #475569;border-radius:14px;padding:38px 20px;text-align:center;color:var(--mut);cursor:pointer;transition:.15s;background:var(--card);}
   #drop.drag{border-color:var(--acc);background:#243449;color:var(--txt)}
   #drop b{color:var(--acc)}
-  #drop.off{opacity:.5;cursor:not-allowed}
   .row{display:flex;gap:18px;margin-top:20px;align-items:flex-start;flex-wrap:wrap}
   #lista{flex:1;min-width:320px}
-  #panel{flex:1;min-width:340px}
+  #panel{flex:1.3;min-width:360px}
   .item{background:var(--card);border-radius:10px;padding:11px 13px;margin-bottom:9px;border-left:4px solid #475569;display:flex;justify-content:space-between;align-items:center;gap:10px}
-  .item.ok{border-color:var(--ok)} .item.err{border-color:var(--err)} .item.warn{border-color:var(--warn)} .item.run{border-color:var(--acc)}
+  .item.ok{border-color:var(--ok)} .item.err{border-color:var(--err)} .item.warn{border-color:var(--warn)}
+  .item.run,.item.listo{border-color:var(--acc)}
   .item .n{font-size:13px;word-break:break-all}
   .item .s{font-size:12px;color:var(--mut);margin-top:2px}
   .item button{background:var(--bord);color:var(--txt);border:0;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}
   .item button:hover{background:#475569}
-  pre{background:#0b1220;border:1px solid var(--bord);border-radius:10px;padding:14px;max-height:600px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  pre{background:#0b1220;border:1px solid var(--bord);border-radius:10px;padding:14px;max-height:520px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
   .btns{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;align-items:center}
   .btns button{background:var(--acc);color:#04283a;border:0;padding:9px 14px;border-radius:8px;font-weight:600;cursor:pointer}
   .btns button.sec{background:var(--bord);color:var(--txt)}
   .btns button:disabled{opacity:.45;cursor:not-allowed}
   .alert{background:#3b2c08;border:1px solid var(--warn);color:#fde68a;padding:10px 12px;border-radius:8px;margin-bottom:10px;font-size:13px}
   .alert.bad{background:#3b0d0d;border-color:var(--err);color:#fecaca}
+  .alert.good{background:#052e16;border-color:#166534;color:#bbf7d0}
   .muted{color:var(--mut);font-size:13px}
+  .pasos{counter-reset:p;margin:0 0 12px;padding:0;list-style:none}
+  .pasos li{counter-increment:p;position:relative;padding:0 0 10px 30px;font-size:13px;line-height:1.5;color:var(--txt)}
+  .pasos li::before{content:counter(p);position:absolute;left:0;top:0;width:21px;height:21px;border-radius:50%;background:var(--acc);color:#04283a;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .pasos li small{color:var(--mut);display:block;margin-top:2px;font-size:12px}
   .tot{font-size:12px;color:var(--mut);margin-left:auto}
   .tot b{color:var(--txt)}
-  .foot{color:var(--mut);font-size:12px;margin-top:26px;border-top:1px solid var(--bord);padding-top:12px;line-height:1.6}
+  .foot{color:var(--mut);font-size:12px;margin-top:26px;border-top:1px solid var(--bord);padding-top:12px;line-height:1.65}
   code{background:#0b1220;border:1px solid var(--bord);border-radius:4px;padding:1px 5px;font-size:12px}
+  a{color:var(--acc)}
 </style>
 </head>
 <body>
 <header>
   <h1>Extractor de Certificados CCB → JSON canónico</h1>
-  <p>Extracción completa con las <b>68 reglas</b> del proyecto de migración, la misma estructura canónica bloqueada y el mismo normalizador determinista.</p>
+  <p>Las <b>68 reglas</b> del proyecto de migración, la estructura canónica bloqueada y el normalizador determinista.</p>
 </header>
 <main>
   <div id="avisos"></div>
 
   <fieldset>
-    <legend>Configuración</legend>
-    <div class="cfg">
+    <legend>Cómo querés extraer</legend>
+    <div class="modos">
+      <div class="modo" data-modo="claude">
+        <b>Con tu Claude<span class="tag g">68/68 reglas</span></b>
+        <span>Sin clave y sin costo. La página arma el prompt completo, vos lo pegás en Claude y traés el JSON de vuelta acá para normalizarlo y validarlo.</span>
+      </div>
+      <div class="modo" data-modo="api">
+        <b>Automático por API<span class="tag a">68/68 reglas</span></b>
+        <span>Todo de corrido, sin pasos manuales. Necesita una clave de API de Anthropic y tiene costo por certificado.</span>
+      </div>
+      <div class="modo" data-modo="borrador">
+        <b>Borrador local<span class="tag r">parcial</span></b>
+        <span>Solo expresiones regulares. Rápido para mirar un PDF, pero llena entre el 20% y el 60% de los campos. No sirve para cargar al S3.</span>
+      </div>
+    </div>
+
+    <div class="cfg oculto" id="cfgApi">
       <div class="campo">
         <label for="key">Clave de API de Anthropic (se guarda solo en este navegador)</label>
         <input id="key" type="password" placeholder="sk-ant-..." autocomplete="off">
@@ -66,28 +100,21 @@
         <label for="modelo">Modelo</label>
         <select id="modelo"></select>
       </div>
-      <div class="campo">
-        <label for="paralelo">Certificados en paralelo</label>
-        <select id="paralelo">
-          <option>1</option><option selected>3</option><option>5</option><option>8</option>
-        </select>
-      </div>
       <label class="chk"><input id="auditar" type="checkbox" checked> Segunda pasada de completitud</label>
-      <label class="chk"><input id="borrador" type="checkbox"> Modo borrador (sin API, solo reglas locales)</label>
     </div>
   </fieldset>
 
-  <div id="drop">Arrastra aquí los <b>PDF</b> de certificados, o toca para seleccionarlos<input id="file" type="file" accept="application/pdf" multiple hidden></div>
+  <div id="drop">Arrastra aquí un <b>PDF</b> de certificado, o toca para seleccionarlo<input id="file" type="file" accept="application/pdf" multiple hidden></div>
 
   <div class="row">
     <div id="lista"><p class="muted">Aún no has cargado certificados.</p></div>
-    <div id="panel"><p class="muted">Selecciona un certificado de la lista para ver su JSON.</p></div>
+    <div id="panel"><p class="muted">Carga un certificado para empezar.</p></div>
   </div>
 
   <div class="foot">
-    <b>Cómo funciona.</b> El PDF se lee en tu navegador con pdf.js; el <b>texto</b> del certificado se envía a la API de Anthropic con tu propia clave, se extrae aplicando las 68 reglas de <code>PROMPT_FINAL.md</code>, se audita contra el mismo texto y se normaliza a la estructura canónica exacta. El PDF nunca se sube a ningún servidor propio: no existe backend.<br>
-    <b>Tu clave.</b> Se guarda solo en el almacenamiento local de este navegador y viaja únicamente a <code>api.anthropic.com</code>. Usa una clave dedicada con límite de gasto.<br>
-    <b>Modo borrador.</b> Sin clave, la herramienta aplica un parser local de expresiones regulares: sirve para inspeccionar rápido, <b>no</b> produce el JSON canónico completo y no debe cargarse al S3.
+    <b>El PDF no sale de tu equipo.</b> Se lee en el navegador con pdf.js y no hay backend. En el modo automático por API el <i>texto</i> del certificado viaja a <code>api.anthropic.com</code> con tu propia clave; en el modo con tu Claude, sos vos quien decide dónde pegarlo.<br>
+    <b>La estructura la cierra la página.</b> Venga de donde venga el JSON, se pasa por el mismo normalizador determinista del pipeline: orden y nombres exactos, faltantes en <code>null</code>/<code>[]</code>/<code>{}</code>, claves no canónicas descartadas.<br>
+    <b>Nombre de salida.</b> <code>CER-&lt;matrícula sin ceros&gt;.json</code> para registro mercantil, <code>CER-S&lt;matrícula&gt;.json</code> para ESADL.
   </div>
 </main>
 
@@ -103,13 +130,14 @@
 <script type="module">
 import { pdfATexto } from "./texto.js";
 import { normalizar, cobertura } from "./canonico.js";
-import { extraerCertificado, costoUSD, MODELOS, cargarReglas } from "./extractor-llm.js";
+import { cargarReglas, promptCompleto } from "./prompt.js";
+import { extraerCertificado, costoUSD, parseJSON, MODELOS } from "./extractor-llm.js";
 import { parse as parseLocal } from "./parser-local.js";
 import { crearZip } from "./zip.js";
 
 const $ = (id) => document.getElementById(id);
 const drop=$('drop'), file=$('file'), lista=$('lista'), panel=$('panel');
-const inKey=$('key'), inModelo=$('modelo'), inParalelo=$('paralelo'), inAuditar=$('auditar'), inBorrador=$('borrador');
+const inKey=$('key'), inModelo=$('modelo'), inAuditar=$('auditar');
 
 for (const [id, m] of Object.entries(MODELOS)) {
   const o = document.createElement('option');
@@ -117,34 +145,33 @@ for (const [id, m] of Object.entries(MODELOS)) {
   inModelo.appendChild(o);
 }
 
-// --- preferencias locales ---
 const LS = {
   get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
   set(k, v){ try { localStorage.setItem(k, v); } catch {} },
 };
-inKey.value      = LS.get('ccb_api_key','');
-inModelo.value   = LS.get('ccb_modelo','claude-opus-5');
-inParalelo.value = LS.get('ccb_paralelo','3');
-inAuditar.checked  = LS.get('ccb_auditar','1') === '1';
-inBorrador.checked = LS.get('ccb_borrador','0') === '1';
-inKey.onchange      = () => LS.set('ccb_api_key', inKey.value.trim());
-inModelo.onchange   = () => LS.set('ccb_modelo', inModelo.value);
-inParalelo.onchange = () => LS.set('ccb_paralelo', inParalelo.value);
-inAuditar.onchange  = () => LS.set('ccb_auditar', inAuditar.checked ? '1' : '0');
-inBorrador.onchange = () => { LS.set('ccb_borrador', inBorrador.checked ? '1' : '0'); pintarModo(); };
 
+let modo = LS.get('ccb_modo', 'claude');
+inKey.value     = LS.get('ccb_api_key','');
+inModelo.value  = LS.get('ccb_modelo','claude-opus-5');
+inAuditar.checked = LS.get('ccb_auditar','1') === '1';
+inKey.onchange     = () => LS.set('ccb_api_key', inKey.value.trim());
+inModelo.onchange  = () => LS.set('ccb_modelo', inModelo.value);
+inAuditar.onchange = () => LS.set('ccb_auditar', inAuditar.checked ? '1' : '0');
+
+document.querySelectorAll('.modo').forEach(el => {
+  el.onclick = () => { modo = el.dataset.modo; LS.set('ccb_modo', modo); pintarModo(); };
+});
 function pintarModo(){
-  const b = inBorrador.checked;
-  inKey.disabled = b; inModelo.disabled = b; inAuditar.disabled = b;
-  drop.firstChild.textContent = b ? 'Modo borrador — arrastra aquí los ' : 'Arrastra aquí los ';
+  document.querySelectorAll('.modo').forEach(el => el.classList.toggle('sel', el.dataset.modo === modo));
+  $('cfgApi').classList.toggle('oculto', modo !== 'api');
 }
 pintarModo();
 
-// precarga las reglas para fallar temprano si el despliegue quedó incompleto
-cargarReglas().catch(e => mostrarAviso(e.message, true));
+let reglas = null;
+cargarReglas().then(r => { reglas = r; }).catch(e => mostrarAviso(e.message, true));
 
-// --- estado ---
 let resultados = [];
+let seleccion = -1;
 const totales = { entrada: 0, salida: 0, usd: 0 };
 
 drop.onclick = () => file.click();
@@ -156,77 +183,69 @@ drop.addEventListener('drop', e => encolar(e.dataTransfer.files));
 async function encolar(files){
   const pdfs = [...files].filter(f => f.name.toLowerCase().endsWith('.pdf'));
   if (!pdfs.length) return;
-  if (!inBorrador.checked && !inKey.value.trim()) {
-    mostrarAviso('Escribe tu clave de API de Anthropic, o marca "Modo borrador" para usar solo las reglas locales.', true);
+  if (modo === 'api' && !inKey.value.trim()) {
+    mostrarAviso('Escribe tu clave de API, o elegí el modo "Con tu Claude" que no necesita clave.', true);
     return;
   }
   LS.set('ccb_api_key', inKey.value.trim());
-
-  const nuevos = pdfs.map(f => {
+  for (const f of pdfs) {
     const idx = resultados.length;
-    resultados.push({ nombre: f.name, estado: 'espera', detalle: 'en cola', archivo: f });
-    return idx;
-  });
-  render();
-
-  const n = parseInt(inParalelo.value, 10) || 3;
-  const cola = nuevos.slice();
-  const obreros = Array.from({ length: Math.min(n, cola.length) }, async () => {
-    while (cola.length) await procesar(cola.shift());
-  });
-  await Promise.all(obreros);
+    resultados.push({ nombre: f.name, estado: 'run', detalle: 'leyendo el PDF', archivo: f });
+    render();
+    await procesar(idx);
+    if (seleccion === -1 || pdfs.length === 1) { seleccion = idx; verPanel(); }
+  }
 }
 
 async function procesar(idx){
   const r = resultados[idx];
   const set = (estado, detalle) => { r.estado = estado; r.detalle = detalle; render(); };
-  set('run', 'leyendo el PDF');
   try {
     const buf = new Uint8Array(await r.archivo.arrayBuffer());
-    const texto = await pdfATexto(buf);
-    r.texto = texto;
-    if (!texto.replace(/\s/g,'').length) throw new Error('El PDF no tiene texto (parece escaneado): requiere OCR previo.');
+    r.texto = await pdfATexto(buf);
+    if (!r.texto.replace(/\s/g,'').length) throw new Error('El PDF no tiene capa de texto (parece escaneado): requiere OCR previo.');
 
-    let json, uso = null, cob;
-    if (inBorrador.checked) {
+    if (modo === 'claude') {
+      set('listo', 'texto listo · ' + r.texto.length.toLocaleString('es') + ' caracteres · falta pegar el JSON');
+      return;
+    }
+    if (modo === 'borrador') {
       set('run', 'aplicando reglas locales');
-      const out = parseLocal(texto, r.archivo.name);
+      const out = parseLocal(r.texto, r.archivo.name);
       const crudo = out.json || out;
       delete crudo._alertas;
-      json = normalizar(crudo);
-      cob = cobertura(json);
-    } else {
-      const res = await extraerCertificado({
-        apiKey: inKey.value.trim(),
-        texto,
-        archivo: r.archivo.name,
-        modelo: inModelo.value,
-        auditar: inAuditar.checked,
-        onEstado: (t) => set('run', t),
-      });
-      json = res.json; uso = res.uso; cob = res.cobertura;
-      totales.entrada += uso.entrada;
-      totales.salida  += uso.salida;
-      totales.usd     += costoUSD(uso, inModelo.value);
+      aceptarJSON(idx, crudo, true);
+      return;
     }
-
-    r.json = json;
-    r.cobertura = cob;
-    r.matricula = json.datos_matriculado.matricula_numero;
-    r.tipo = json.metadata_certificado.tipo_certificado || json.datos_matriculado.tipo_registro || '';
-    r.avisos = revisar(r, json);
-    r.estado = r.avisos.length ? 'warn' : 'ok';
-    r.detalle = resumen(json, cob) + (inBorrador.checked ? ' · BORRADOR' : '');
+    const res = await extraerCertificado({
+      apiKey: inKey.value.trim(), texto: r.texto, archivo: r.archivo.name,
+      modelo: inModelo.value, auditar: inAuditar.checked,
+      onEstado: (t) => set('run', t),
+    });
+    totales.entrada += res.uso.entrada;
+    totales.salida  += res.uso.salida;
+    totales.usd     += costoUSD(res.uso, inModelo.value);
+    aceptarJSON(idx, res.json, false);
   } catch (e) {
-    r.estado = 'err';
-    r.detalle = e.message;
+    set('err', e.message);
   }
+}
+
+/** Punto unico de entrada del JSON: normaliza, valida y marca el estado. */
+function aceptarJSON(idx, crudo, esBorrador){
+  const r = resultados[idx];
+  crudo.archivo_fuente = r.archivo.name;
+  const json = normalizar(crudo);
+  r.json = json;
+  r.cobertura = cobertura(json);
+  r.avisos = revisar(r, json);
+  r.estado = r.avisos.length ? 'warn' : 'ok';
+  r.detalle = resumen(json, r.cobertura) + (esBorrador ? ' · BORRADOR' : '');
   render();
+  if (seleccion === idx) verPanel();
 }
 
 function resumen(json, cob){
-  const partes = [];
-  if (json.datos_matriculado.matricula_numero) partes.push('matrícula ' + json.datos_matriculado.matricula_numero);
   const filas =
     json.historico_reformas.length + json.reformas_estatutarias.length + json.socios.length +
     json.representantes_legales.length + json.junta_directiva.length + json.revisores_fiscales.length +
@@ -234,9 +253,11 @@ function resumen(json, cob){
     json.procesos_reorganizacion_adjudicacion_liquidacion.length +
     json.situaciones_de_control_y_grupos_empresariales.length +
     json.establecimientos_sucursales_agencias.length + json.propietarios.length;
-  partes.push(cob.con_dato + ' campos con dato');
-  partes.push(filas + ' registros');
-  return partes.join(' · ');
+  const p = [];
+  if (json.datos_matriculado.matricula_numero) p.push('matrícula ' + json.datos_matriculado.matricula_numero);
+  p.push(cob.con_dato + ' campos con dato');
+  p.push(filas + ' registros');
+  return p.join(' · ');
 }
 
 /** Chequeos de coherencia sobre el JSON ya canónico. No modifica nada. */
@@ -249,11 +270,16 @@ function revisar(r, json){
   }
   if (!json.datos_matriculado.nombre) av.push('No se identificó el nombre del matriculado.');
   if (!mat) av.push('No se identificó la matrícula.');
-  const esSociedad = /SOCIEDAD|SAS|LTDA|ANONIMA|COMANDITA|EMPRESA/i.test(String(json.datos_matriculado.tipo_registro || '') + ' ' + String(json.datos_matriculado.tipo_sociedad || ''));
+  const esSociedad = /SOCIEDAD|SAS|LTDA|ANONIMA|COMANDITA|EMPRESA/i.test(String(json.datos_matriculado.tipo_registro||'') + ' ' + String(json.datos_matriculado.tipo_sociedad||''));
   const capVacio = !json.capital.capital_autorizado.valor && !json.capital.capital_social.valor && !json.capital_eats.aporte_laboral;
-  if (esSociedad && capVacio) av.push('Sociedad sin capital extraído: verificar si el certificado lo reporta (regla 40).');
-  if (esSociedad && !json.representantes_legales.length) av.push('Sociedad sin representantes legales: verificar la sección de nombramientos.');
+  if (esSociedad && capVacio) av.push('Sociedad sin capital extraído: verificá si el certificado lo reporta (regla 40).');
+  if (esSociedad && !json.representantes_legales.length) av.push('Sociedad sin representantes legales: verificá la sección de nombramientos.');
   if (!json.metadata_certificado.tipo_certificado) av.push('No se identificó el tipo de certificado.');
+  const unidos = [];
+  for (const g of ['historico_reformas','reformas_estatutarias','embargos','medidas_cautelares']) {
+    for (const x of json[g]) if (x.numero_inscripcion && /[,;]|\sy\s/.test(String(x.numero_inscripcion))) unidos.push(g);
+  }
+  if (unidos.length) av.push('Hay números de inscripción unidos en ' + [...new Set(unidos)].join(', ') + ': deben ir en registros separados (regla 44).');
   return av;
 }
 
@@ -261,47 +287,91 @@ function nombreSalida(r){
   const mat = r.json && r.json.datos_matriculado.matricula_numero;
   if (!mat) return 'CER-sin_matricula.json';
   const s = String(mat);
-  return /^S/i.test(s) ? 'CER-' + s.toUpperCase() + '.json'    // ESADL: matrícula S, sin quitar ceros
-                       : 'CER-' + s.replace(/^0+/, '') + '.json'; // REGMER: nombre sin ceros
+  return /^S/i.test(s) ? 'CER-' + s.toUpperCase() + '.json' : 'CER-' + s.replace(/^0+/, '') + '.json';
 }
 
 function render(){
   if (!resultados.length) { lista.innerHTML = '<p class="muted">Aún no has cargado certificados.</p>'; return; }
   const hechos = resultados.filter(r => r.json).length;
-  const enCurso = resultados.some(r => r.estado === 'run' || r.estado === 'espera');
   lista.innerHTML =
     '<div class="btns">' +
       '<button id="bzip"' + (hechos ? '' : ' disabled') + '>Descargar ZIP (' + hechos + ')</button>' +
       '<button class="sec" id="blimpiar">Limpiar</button>' +
-      '<span class="tot">' + (totales.usd ? 'costo API: <b>US$ ' + totales.usd.toFixed(3) + '</b> · ' : '') +
-        (totales.salida ? (totales.entrada/1000).toFixed(0) + 'k in / ' + (totales.salida/1000).toFixed(0) + 'k out' : '') +
-      '</span>' +
+      '<span class="tot">' + (totales.usd ? 'costo API: <b>US$ ' + totales.usd.toFixed(3) + '</b>' : '') + '</span>' +
     '</div>' +
     resultados.map((r,i) =>
       '<div class="item ' + r.estado + '">' +
         '<div><div class="n">' + esc(r.nombre) + '</div><div class="s">' + esc(r.detalle || '') + '</div></div>' +
-        (r.json ? '<button data-ver="' + i + '">Ver / Descargar</button>' : '') +
+        (r.texto ? '<button data-ver="' + i + '">' + (r.json ? 'Ver JSON' : 'Continuar') + '</button>' : '') +
       '</div>').join('');
   const bz = $('bzip'); if (bz) bz.onclick = descargarZip;
-  $('blimpiar').onclick = () => { if (enCurso) return; resultados = []; totales.entrada = totales.salida = 0; totales.usd = 0; render(); panel.innerHTML = '<p class="muted">Selecciona un certificado de la lista para ver su JSON.</p>'; };
-  lista.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => ver(+b.dataset.ver));
+  $('blimpiar').onclick = () => { resultados = []; seleccion = -1; totales.entrada = totales.salida = 0; totales.usd = 0; render(); panel.innerHTML = '<p class="muted">Carga un certificado para empezar.</p>'; };
+  lista.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { seleccion = +b.dataset.ver; verPanel(); });
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-function ver(i){
-  const r = resultados[i];
-  if (!r.json) return;
+function verPanel(){
+  const r = resultados[seleccion];
+  if (!r || !r.texto) return;
+  if (!r.json) return panelClaude(r);
+  panelJSON(r);
+}
+
+/** Modo con tu Claude: prompt para copiar + caja para traer el JSON de vuelta. */
+function panelClaude(r){
+  if (!reglas) { panel.innerHTML = '<p class="muted">Cargando las reglas…</p>'; return; }
+  const prompt = promptCompleto(reglas, r.texto, r.archivo.name);
+  panel.innerHTML =
+    '<ol class="pasos">' +
+      '<li>Copiá el prompt completo — trae las 68 reglas, las tablas de códigos, la estructura canónica y el texto del certificado.' +
+        '<small>' + prompt.length.toLocaleString('es') + ' caracteres. Si tu Claude no acepta un pegado tan largo, descargalo y adjuntá el archivo.</small></li>' +
+      '<li>Pegalo en Claude (claude.ai o Claude Code) y esperá el JSON.' +
+        '<small>Con tu plan no tiene costo adicional.</small></li>' +
+      '<li>Pegá acá abajo lo que te devolvió y dale a Normalizar.' +
+        '<small>La página le aplica el normalizador canónico y los chequeos de coherencia.</small></li>' +
+    '</ol>' +
+    '<div class="btns">' +
+      '<button id="bcopiar">Copiar prompt</button>' +
+      '<button class="sec" id="bdesc">Descargar prompt.md</button>' +
+      '<button class="sec" id="btxt">Ver texto del PDF</button>' +
+    '</div>' +
+    '<textarea id="tjson" placeholder="Pegá acá el JSON que devolvió Claude…" spellcheck="false"></textarea>' +
+    '<div class="btns"><button id="bnorm">Normalizar y validar</button></div>';
+
+  $('bcopiar').onclick = async (e) => {
+    try { await navigator.clipboard.writeText(prompt); e.target.textContent = 'Copiado ✓'; setTimeout(() => e.target.textContent = 'Copiar prompt', 1800); }
+    catch { mostrarAviso('El navegador bloqueó el portapapeles. Usá "Descargar prompt.md".', true); }
+  };
+  $('bdesc').onclick = () => descargar('prompt-' + r.archivo.name.replace(/\.pdf$/i,'') + '.md', prompt, 'text/markdown');
+  $('btxt').onclick  = () => { panel.innerHTML = '<div class="btns"><button id="bvol">Volver</button></div><pre>' + esc(r.texto) + '</pre>'; $('bvol').onclick = verPanel; };
+  $('bnorm').onclick = () => {
+    const t = $('tjson').value.trim();
+    if (!t) return mostrarAviso('Pegá primero el JSON que devolvió Claude.', true);
+    let crudo;
+    try { crudo = parseJSON(t); }
+    catch (err) { return mostrarAviso('No se pudo leer el JSON: ' + err.message, true); }
+    aceptarJSON(seleccion, crudo, false);
+  };
+}
+
+function panelJSON(r){
   const cob = r.cobertura;
   panel.innerHTML =
-    (r.avisos || []).map(a => '<div class="alert">⚠️ ' + esc(a) + '</div>').join('') +
+    (r.avisos.length
+      ? r.avisos.map(a => '<div class="alert">⚠️ ' + esc(a) + '</div>').join('')
+      : '<div class="alert good">✓ Estructura canónica completa y sin incoherencias detectadas.</div>') +
     (cob.grupos_vacios.length ? '<div class="alert">Grupos vacíos: ' + esc(cob.grupos_vacios.join(', ')) + '</div>' : '') +
-    '<div class="btns"><button data-desc="' + i + '">Descargar ' + nombreSalida(r) + '</button>' +
-      '<button class="sec" data-copy="' + i + '">Copiar</button>' +
-      '<button class="sec" data-txt="' + i + '">Ver texto del PDF</button></div>' +
+    '<div class="btns">' +
+      '<button id="bdesc2">Descargar ' + nombreSalida(r) + '</button>' +
+      '<button class="sec" id="bcopy2">Copiar</button>' +
+      '<button class="sec" id="btxt2">Ver texto del PDF</button>' +
+      '<button class="sec" id="brehacer">Rehacer</button>' +
+    '</div>' +
     '<pre>' + esc(JSON.stringify(r.json, null, 2)) + '</pre>';
-  panel.querySelector('[data-desc]').onclick = () => descargar(nombreSalida(r), JSON.stringify(r.json, null, 2), 'application/json');
-  panel.querySelector('[data-copy]').onclick = () => navigator.clipboard.writeText(JSON.stringify(r.json, null, 2));
-  panel.querySelector('[data-txt]').onclick  = () => { panel.innerHTML = '<div class="btns"><button data-vol="' + i + '">Volver al JSON</button></div><pre>' + esc(r.texto || '') + '</pre>'; panel.querySelector('[data-vol]').onclick = () => ver(i); };
+  $('bdesc2').onclick = () => descargar(nombreSalida(r), JSON.stringify(r.json, null, 2), 'application/json');
+  $('bcopy2').onclick = () => navigator.clipboard.writeText(JSON.stringify(r.json, null, 2));
+  $('btxt2').onclick  = () => { panel.innerHTML = '<div class="btns"><button id="bvol2">Volver</button></div><pre>' + esc(r.texto) + '</pre>'; $('bvol2').onclick = verPanel; };
+  $('brehacer').onclick = () => { r.json = null; r.avisos = []; r.estado = 'listo'; r.detalle = 'texto listo · falta pegar el JSON'; render(); verPanel(); };
 }
 
 function descargar(nombre, contenido, tipo){
@@ -309,12 +379,11 @@ function descargar(nombre, contenido, tipo){
   a.href = URL.createObjectURL(new Blob([contenido], { type: tipo }));
   a.download = nombre;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  setTimeout(() => URL.revokeObjectURL(a.href), 6000);
 }
 
 function descargarZip(){
-  const archivos = resultados.filter(r => r.json)
-    .map(r => ({ nombre: nombreSalida(r), contenido: JSON.stringify(r.json, null, 2) }));
+  const archivos = resultados.filter(r => r.json).map(r => ({ nombre: nombreSalida(r), contenido: JSON.stringify(r.json, null, 2) }));
   if (!archivos.length) return;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(crearZip(archivos));
