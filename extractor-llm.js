@@ -9,8 +9,8 @@
 //   4. normalizar() -> estructura canonica bloqueada, orden y nombres exactos
 
 import Anthropic from "./anthropic.min.mjs";
-import { normalizar, cobertura } from "./canonico.js";
-import { cargarReglas, bloquesSistema, mensajeCertificado } from "./prompt.js";
+import { normalizar, cobertura } from "./canonico.js?v=3";
+import { cargarReglas, bloquesSistema, mensajeCertificado } from "./prompt.js?v=3";
 
 export const MODELOS = {
   "claude-opus-5": { etiqueta: "Claude Opus 5 (maxima precision)", in: 5, out: 25 },

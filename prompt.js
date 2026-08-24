@@ -14,8 +14,8 @@ export async function cargarReglas() {
     return r.text();
   };
   const [prompt, tablas] = await Promise.all([
-    leer("./reglas/PROMPT_FINAL.md"),
-    leer("./reglas/tablas_codigos.md"),
+    leer("./reglas/PROMPT_FINAL.md?v=3"),
+    leer("./reglas/tablas_codigos.md?v=3"),
   ]);
   REGLAS = { prompt, tablas };
   return REGLAS;

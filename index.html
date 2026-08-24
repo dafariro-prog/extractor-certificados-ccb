@@ -114,7 +114,8 @@
   <div class="foot">
     <b>El PDF no sale de tu equipo.</b> Se lee en el navegador con pdf.js y no hay backend. En el modo automático por API el <i>texto</i> del certificado viaja a <code>api.anthropic.com</code> con tu propia clave; en el modo con tu Claude, sos vos quien decide dónde pegarlo.<br>
     <b>La estructura la cierra la página.</b> Venga de donde venga el JSON, se pasa por el mismo normalizador determinista del pipeline: orden y nombres exactos, faltantes en <code>null</code>/<code>[]</code>/<code>{}</code>, claves no canónicas descartadas.<br>
-    <b>Nombre de salida.</b> <code>CER-&lt;matrícula sin ceros&gt;.json</code> para registro mercantil, <code>CER-S&lt;matrícula&gt;.json</code> para ESADL.
+    <b>Nombre de salida.</b> <code>CER-&lt;matrícula sin ceros&gt;.json</code> para registro mercantil, <code>CER-S&lt;matrícula&gt;.json</code> para ESADL.<br>
+    <b>Build</b> <span id="build">3</span> — si algo se ve raro después de una actualización, recargá con Ctrl+F5.
   </div>
 </main>
 
@@ -128,12 +129,12 @@
 </script>
 
 <script type="module">
-import { pdfATexto } from "./texto.js";
-import { normalizarConDiagnostico } from "./canonico.js";
-import { cargarReglas, promptCompleto } from "./prompt.js";
-import { extraerCertificado, costoUSD, parseJSON, MODELOS } from "./extractor-llm.js";
-import { parse as parseLocal } from "./parser-local.js";
-import { crearZip } from "./zip.js";
+import { pdfATexto } from "./texto.js?v=3";
+import { normalizarConDiagnostico } from "./canonico.js?v=3";
+import { cargarReglas, promptCompleto } from "./prompt.js?v=3";
+import { extraerCertificado, costoUSD, parseJSON, MODELOS } from "./extractor-llm.js?v=3";
+import { parse as parseLocal } from "./parser-local.js?v=3";
+import { crearZip } from "./zip.js?v=3";
 
 const $ = (id) => document.getElementById(id);
 const drop=$('drop'), file=$('file'), lista=$('lista'), panel=$('panel');
