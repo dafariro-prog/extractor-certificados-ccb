@@ -27,7 +27,13 @@ export const SALIDA = `
 Devuelve UNICAMENTE el objeto JSON canonico completo, sin markdown, sin explicaciones
 y sin texto antes ni despues. Incluye SIEMPRE todas las claves de la estructura
 canonica, en el mismo orden; las que no apliquen van en null, [] o {}.
-No inventes datos que no esten en el certificado (regla 48).`;
+No inventes datos que no esten en el certificado (regla 48).
+
+La estructura canonica que aparece mas abajo es SOLO UNA PLANTILLA DE REFERENCIA:
+muestra los nombres y el orden de los campos, con todos los valores en null y un
+elemento de ejemplo por arreglo. NO la devuelvas tal cual. Devuelve esa misma forma
+pero RELLENA con los datos reales del certificado, y con tantos elementos por arreglo
+como registros tenga el documento (o [] si no tiene ninguno).`;
 
 /** Bloques del system prompt para la llamada por API (el prefijo se cachea). */
 export function bloquesSistema({ prompt, tablas }) {

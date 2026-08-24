@@ -200,3 +200,59 @@ export function cobertura(json) {
   }
   return { hojas, con_dato: conDato, grupos_vacios: vacios };
 }
+
+// ---------------------------------------------------------------------------
+// Diagnostico del JSON de entrada
+// ---------------------------------------------------------------------------
+
+function puntajeCanonico(o) {
+  if (!isPlainObj(o)) return 0;
+  const ks = Object.keys(TEMPLATE);
+  return Object.keys(o).filter((k) => ks.includes(k)).length;
+}
+
+/**
+ * Si el JSON viene envuelto ({"certificado": {...}}, {"json": {...}}, ...),
+ * devuelve el objeto de adentro. Si ya es canonico, lo devuelve tal cual.
+ */
+export function desenvolver(o) {
+  if (!isPlainObj(o)) return o;
+  if (puntajeCanonico(o) >= 3) return o;
+  for (const k of Object.keys(o)) {
+    if (puntajeCanonico(o[k]) >= 3) return o[k];
+  }
+  return o;
+}
+
+/** Rutas presentes en el origen que NO existen en la estructura canonica. */
+export function clavesDescartadas(src, tmpl = TEMPLATE, ruta = "", out = []) {
+  if (Array.isArray(tmpl)) {
+    if (!Array.isArray(src) || tmpl.length === 0) return out;
+    src.forEach((e) => clavesDescartadas(e, tmpl[0], ruta + "[]", out));
+    return out;
+  }
+  if (isPlainObj(tmpl)) {
+    if (!isPlainObj(src)) return out;
+    for (const k of Object.keys(src)) {
+      const r = ruta ? ruta + "." + k : k;
+      if (!(k in tmpl)) { if (out.length < 40) out.push(r); continue; }
+      clavesDescartadas(src[k], tmpl[k], r, out);
+    }
+  }
+  return out;
+}
+
+/**
+ * Normaliza y ademas explica que paso: claves descartadas y si el JSON venia
+ * practicamente vacio (el caso tipico es haber pegado la plantilla de
+ * referencia del prompt en vez de la respuesta con datos).
+ */
+export function normalizarConDiagnostico(crudo) {
+  const src = desenvolver(crudo);
+  const descartadas = clavesDescartadas(src);
+  const json = normalizar(src);
+  const cob = cobertura(json);
+  // 1 = moneda "COP", que es un valor por defecto de la plantilla
+  const vacio = cob.con_dato <= 1 + (json.archivo_fuente ? 1 : 0);
+  return { json, cobertura: cob, descartadas, vacio };
+}

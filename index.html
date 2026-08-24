@@ -129,7 +129,7 @@
 
 <script type="module">
 import { pdfATexto } from "./texto.js";
-import { normalizar, cobertura } from "./canonico.js";
+import { normalizarConDiagnostico } from "./canonico.js";
 import { cargarReglas, promptCompleto } from "./prompt.js";
 import { extraerCertificado, costoUSD, parseJSON, MODELOS } from "./extractor-llm.js";
 import { parse as parseLocal } from "./parser-local.js";
@@ -231,16 +231,32 @@ async function procesar(idx){
   }
 }
 
-/** Punto unico de entrada del JSON: normaliza, valida y marca el estado. */
+/** Punto unico de entrada del JSON: diagnostica, normaliza, valida. */
 function aceptarJSON(idx, crudo, esBorrador){
   const r = resultados[idx];
   crudo.archivo_fuente = r.archivo.name;
-  const json = normalizar(crudo);
-  r.json = json;
-  r.cobertura = cobertura(json);
-  r.avisos = revisar(r, json);
+  const d = normalizarConDiagnostico(crudo);
+
+  if (d.vacio) {
+    const plantilla = d.json.historico_reformas.length === 1 && d.json.socios.length === 1;
+    mostrarAviso(
+      plantilla
+        ? 'Eso que pegaste es la ESTRUCTURA DE REFERENCIA del prompt, no la respuesta de Claude: viene sin un solo dato. Copiá el JSON que Claude devolvió con los datos del certificado.'
+        : 'El JSON que pegaste no trae ningún dato reconocible. Revisá que hayas copiado la respuesta completa de Claude.',
+      true);
+    return;
+  }
+  if (d.descartadas.length) {
+    mostrarAviso('Se descartaron ' + d.descartadas.length + ' claves que no existen en la estructura canónica: ' +
+      d.descartadas.slice(0,6).join(', ') + (d.descartadas.length > 6 ? ', …' : '') +
+      '. Si esos campos traían datos, pedile a Claude que use exactamente los nombres de la estructura canónica.', true);
+  }
+
+  r.json = d.json;
+  r.cobertura = d.cobertura;
+  r.avisos = revisar(r, d.json);
   r.estado = r.avisos.length ? 'warn' : 'ok';
-  r.detalle = resumen(json, r.cobertura) + (esBorrador ? ' · BORRADOR' : '');
+  r.detalle = resumen(d.json, d.cobertura) + (esBorrador ? ' · BORRADOR' : '');
   render();
   if (seleccion === idx) verPanel();
 }
@@ -327,8 +343,8 @@ function panelClaude(r){
         '<small>' + prompt.length.toLocaleString('es') + ' caracteres. Si tu Claude no acepta un pegado tan largo, descargalo y adjuntá el archivo.</small></li>' +
       '<li>Pegalo en Claude (claude.ai o Claude Code) y esperá el JSON.' +
         '<small>Con tu plan no tiene costo adicional.</small></li>' +
-      '<li>Pegá acá abajo lo que te devolvió y dale a Normalizar.' +
-        '<small>La página le aplica el normalizador canónico y los chequeos de coherencia.</small></li>' +
+      '<li>Pegá acá abajo el JSON <b>con los datos</b> que te devolvió y dale a Normalizar.' +
+        '<small>Ojo: el JSON lleno, no la estructura de ejemplo que viaja dentro del prompt. La página aplica el normalizador canónico y los chequeos de coherencia, y te avisa si el pegado viene vacío o con nombres de campo que no son los canónicos.</small></li>' +
     '</ol>' +
     '<div class="btns">' +
       '<button id="bcopiar">Copiar prompt</button>' +
