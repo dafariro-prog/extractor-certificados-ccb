@@ -5,174 +5,325 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extractor de Certificados CCB → JSON</title>
 <style>
-  :root{--bg:#0f172a;--card:#1e293b;--acc:#38bdf8;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--txt:#e2e8f0;--mut:#94a3b8;}
+  :root{--bg:#0f172a;--card:#1e293b;--acc:#38bdf8;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--txt:#e2e8f0;--mut:#94a3b8;--bord:#334155;}
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
-  header{padding:20px 24px;border-bottom:1px solid #334155;}
+  header{padding:20px 24px;border-bottom:1px solid var(--bord);}
   header h1{margin:0;font-size:19px}
   header p{margin:5px 0 0;color:var(--mut);font-size:13px}
-  main{max-width:1100px;margin:0 auto;padding:22px 24px;}
-  #drop{border:2px dashed #475569;border-radius:14px;padding:40px 20px;text-align:center;color:var(--mut);cursor:pointer;transition:.15s;background:var(--card);}
+  main{max-width:1180px;margin:0 auto;padding:22px 24px;}
+  fieldset{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:14px 16px;margin:0 0 18px}
+  legend{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;padding:0 6px}
+  .cfg{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+  .campo{display:flex;flex-direction:column;gap:5px}
+  .campo label{font-size:12px;color:var(--mut)}
+  input[type=password],input[type=text],select{background:#0b1220;border:1px solid var(--bord);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;min-width:190px}
+  input[type=password]{min-width:300px}
+  .chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--txt);padding-bottom:8px}
+  #drop{border:2px dashed #475569;border-radius:14px;padding:38px 20px;text-align:center;color:var(--mut);cursor:pointer;transition:.15s;background:var(--card);}
   #drop.drag{border-color:var(--acc);background:#243449;color:var(--txt)}
   #drop b{color:var(--acc)}
+  #drop.off{opacity:.5;cursor:not-allowed}
   .row{display:flex;gap:18px;margin-top:20px;align-items:flex-start;flex-wrap:wrap}
-  #lista{flex:1;min-width:290px}
+  #lista{flex:1;min-width:320px}
+  #panel{flex:1;min-width:340px}
   .item{background:var(--card);border-radius:10px;padding:11px 13px;margin-bottom:9px;border-left:4px solid #475569;display:flex;justify-content:space-between;align-items:center;gap:10px}
-  .item.ok{border-color:var(--ok)} .item.err{border-color:var(--err)} .item.warn{border-color:var(--warn)}
+  .item.ok{border-color:var(--ok)} .item.err{border-color:var(--err)} .item.warn{border-color:var(--warn)} .item.run{border-color:var(--acc)}
   .item .n{font-size:13px;word-break:break-all}
-  .item .s{font-size:12px;color:var(--mut)}
-  .item button{background:#334155;color:var(--txt);border:0;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px}
+  .item .s{font-size:12px;color:var(--mut);margin-top:2px}
+  .item button{background:var(--bord);color:var(--txt);border:0;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}
   .item button:hover{background:#475569}
-  #panel{flex:1;min-width:330px}
-  pre{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:14px;max-height:560px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-  .btns{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+  pre{background:#0b1220;border:1px solid var(--bord);border-radius:10px;padding:14px;max-height:600px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  .btns{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;align-items:center}
   .btns button{background:var(--acc);color:#04283a;border:0;padding:9px 14px;border-radius:8px;font-weight:600;cursor:pointer}
-  .btns button.sec{background:#334155;color:var(--txt)}
+  .btns button.sec{background:var(--bord);color:var(--txt)}
+  .btns button:disabled{opacity:.45;cursor:not-allowed}
   .alert{background:#3b2c08;border:1px solid var(--warn);color:#fde68a;padding:10px 12px;border-radius:8px;margin-bottom:10px;font-size:13px}
+  .alert.bad{background:#3b0d0d;border-color:var(--err);color:#fecaca}
   .muted{color:var(--mut);font-size:13px}
-  .foot{color:var(--mut);font-size:12px;margin-top:26px;border-top:1px solid #334155;padding-top:12px}
+  .tot{font-size:12px;color:var(--mut);margin-left:auto}
+  .tot b{color:var(--txt)}
+  .foot{color:var(--mut);font-size:12px;margin-top:26px;border-top:1px solid var(--bord);padding-top:12px;line-height:1.6}
+  code{background:#0b1220;border:1px solid var(--bord);border-radius:4px;padding:1px 5px;font-size:12px}
 </style>
 </head>
 <body>
 <header>
   <h1>Extractor de Certificados CCB → JSON canónico</h1>
-  <p>Corre 100% en tu navegador. El PDF <b>no se sube a ningún servidor</b>. Sin costo.</p>
+  <p>Extracción completa con las <b>68 reglas</b> del proyecto de migración, la misma estructura canónica bloqueada y el mismo normalizador determinista.</p>
 </header>
 <main>
+  <div id="avisos"></div>
+
+  <fieldset>
+    <legend>Configuración</legend>
+    <div class="cfg">
+      <div class="campo">
+        <label for="key">Clave de API de Anthropic (se guarda solo en este navegador)</label>
+        <input id="key" type="password" placeholder="sk-ant-..." autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="modelo">Modelo</label>
+        <select id="modelo"></select>
+      </div>
+      <div class="campo">
+        <label for="paralelo">Certificados en paralelo</label>
+        <select id="paralelo">
+          <option>1</option><option selected>3</option><option>5</option><option>8</option>
+        </select>
+      </div>
+      <label class="chk"><input id="auditar" type="checkbox" checked> Segunda pasada de completitud</label>
+      <label class="chk"><input id="borrador" type="checkbox"> Modo borrador (sin API, solo reglas locales)</label>
+    </div>
+  </fieldset>
+
   <div id="drop">Arrastra aquí los <b>PDF</b> de certificados, o toca para seleccionarlos<input id="file" type="file" accept="application/pdf" multiple hidden></div>
+
   <div class="row">
     <div id="lista"><p class="muted">Aún no has cargado certificados.</p></div>
     <div id="panel"><p class="muted">Selecciona un certificado de la lista para ver su JSON.</p></div>
   </div>
-  <div class="foot">Herramienta local (best-effort). En certificados con formatos poco comunes, revisa el JSON antes de cargarlo. Motor: pdf.js + reglas del proyecto de migración CCS.</div>
+
+  <div class="foot">
+    <b>Cómo funciona.</b> El PDF se lee en tu navegador con pdf.js; el <b>texto</b> del certificado se envía a la API de Anthropic con tu propia clave, se extrae aplicando las 68 reglas de <code>PROMPT_FINAL.md</code>, se audita contra el mismo texto y se normaliza a la estructura canónica exacta. El PDF nunca se sube a ningún servidor propio: no existe backend.<br>
+    <b>Tu clave.</b> Se guarda solo en el almacenamiento local de este navegador y viaja únicamente a <code>api.anthropic.com</code>. Usa una clave dedicada con límite de gasto.<br>
+    <b>Modo borrador.</b> Sin clave, la herramienta aplica un parser local de expresiones regulares: sirve para inspeccionar rápido, <b>no</b> produce el JSON canónico completo y no debe cargarse al S3.
+  </div>
 </main>
 
 <script>
-  // Mostrar cualquier error de carga/ejecucion en pantalla (para no quedar en blanco)
-  window.addEventListener('error', e=>{ const d=document.getElementById('lista'); if(d) d.innerHTML='<div class="alert">⚠️ Error: '+(e.message||e.error)+'</div>'+d.innerHTML; });
-  window.addEventListener('unhandledrejection', e=>{ const d=document.getElementById('lista'); if(d) d.innerHTML='<div class="alert">⚠️ Error: '+(e.reason&&e.reason.message||e.reason)+'</div>'+d.innerHTML; });
-</script>
-<script type="module">
-import * as pdfjsLib from "./pdf.min.mjs";
-pdfjsLib.GlobalWorkerOptions.workerSrc = "./pdf.worker.min.mjs";
-
-/* ===== Reconstruccion de layout desde pdf.js ===== */
-function reconstruir(items){
-  const norm=items.filter(it=>it.str!=null).map(it=>({str:it.str,x:it.x,y:it.y,w:it.w||0}));
-  if(!norm.length) return "";
-  const anchos=norm.filter(it=>it.str.trim().length>0&&it.w>0).map(it=>it.w/it.str.length).filter(n=>n>0.3&&n<40).sort((a,b)=>a-b);
-  const charW=anchos.length?anchos[Math.floor(anchos.length/2)]:5;
-  const filas=[];const tol=3;norm.sort((a,b)=>b.y-a.y);
-  for(const it of norm){let f=filas.find(f=>Math.abs(f.y-it.y)<=tol);if(!f){f={y:it.y,items:[]};filas.push(f)}f.items.push(it)}
-  filas.sort((a,b)=>b.y-a.y);const minX=Math.min(...norm.map(it=>it.x));
-  return filas.map(f=>{f.items.sort((a,b)=>a.x-b.x);let l="";for(const it of f.items){const col=Math.max(0,Math.round((it.x-minX)/charW));if(col>l.length)l+=" ".repeat(col-l.length);l+=it.str}return l.replace(/\s+$/,"")}).join("\n");
-}
-async function pdfATexto(buf){
-  const doc=await pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise;
-  let out="";
-  for(let p=1;p<=doc.numPages;p++){const page=await doc.getPage(p);const tc=await page.getTextContent();const items=tc.items.map(i=>({str:i.str,x:i.transform[4],y:i.transform[5],w:i.width}));out+=reconstruir(items)+"\n";}
-  return out;
-}
-
-/* ===== Parser (reglas del proyecto) ===== */
-const MESES={enero:"01",febrero:"02",marzo:"03",abril:"04",mayo:"05",junio:"06",julio:"07",agosto:"08",septiembre:"09",setiembre:"09",octubre:"10",noviembre:"11",diciembre:"12"};
-function fecha(txt){if(!txt)return null;const m=txt.match(/(\d{1,2})\s+de\s+([a-záéíóú]+)\s+de\s+(\d{4})/i);if(!m)return null;const mes=MESES[m[2].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")];if(!mes)return null;return `${m[3]}-${mes}-${m[1].padStart(2,"0")}`;}
-function num(s){if(s==null)return null;const n=String(s).replace(/[.$\s]/g,"").replace(/,00$/,"").replace(/,/g,"");return /^\d+$/.test(n)?parseInt(n,10):null;}
-function clean(s){return s?s.replace(/\s+/g," ").trim():null;}
-const DANE={soacha:"25754","bogota":"11001","bogotá d.c.":"11001","bogota d.c.":"11001"};
-function daneOf(mun){if(!mun)return null;const k=mun.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s*\(.*/,"").trim();return DANE[k]||null;}
-const NIIF={"i":"1","ii":"2","iii":"3"};
-function partirNombre(nc){if(!nc)return{primer_nombre:null,segundo_nombre:null,primer_apellido:null,segundo_apellido:null};const p=nc.trim().split(/\s+/);if(p.length>=4)return{primer_nombre:p[0],segundo_nombre:p[1],primer_apellido:p[2],segundo_apellido:p.slice(3).join(" ")};if(p.length===3)return{primer_nombre:p[0],segundo_nombre:null,primer_apellido:p[1],segundo_apellido:p[2]};if(p.length===2)return{primer_nombre:p[0],segundo_nombre:null,primer_apellido:p[1],segundo_apellido:null};return{primer_nombre:p[0]||null,segundo_nombre:null,primer_apellido:null,segundo_apellido:null};}
-function sinAcentos(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
-function tipoCert(T){const t=sinAcentos(T.toUpperCase());if(/CANCELACION DE MATRICULA|MATRICULA CANCELADA/.test(t))return"CANCELACION";if(/EXISTENCIA Y REPRESENTACION LEGAL/.test(t))return"EXISTENCIA";if(/INSCRIPCIONES? DE LIBROS/.test(t))return"LIBROS";if(/MATRICULA DE ESTABLECIMIENTO DE COMERCIO/.test(t))return"ESTABLECIMIENTO";if(/SIN ANIMO DE LUCRO|ENTIDAD.*INSCRI/.test(t))return"ESADL";if(/MATRICULA DE PERSONA NATURAL/.test(t))return"PERSONA_NATURAL";return"OTRO";}
-function romanToNum(s){if(/^\d+$/.test(s))return s;const map={I:1,V:5,X:10,L:50,C:100};let n=0,prev=0;for(const ch of s.toUpperCase().split("").reverse()){const v=map[ch]||0;n+=v<prev?-v:v;prev=Math.max(prev,v);}return String(n);}
-function plantilla(){return{archivo_fuente:null,metadata_certificado:{camara_comercio:null,tipo_certificado:null,fecha_expedicion:null,hora_expedicion:null,recibo_numero:null,codigo_verificacion:null,destino:null,firmante:{nombre_completo:null,primer_nombre:null,segundo_nombre:null,primer_apellido:null,segundo_apellido:null,genero:null,tipo_firma:null}},datos_matriculado:{nombre:null,tipo_registro:null,tipo_sociedad:null,codigo_tipo_sociedad:null,matricula_numero:null,nit:null,clase_identificacion:null,categoria:null,estado:null,activos_vinculados:null,vigilancia_y_control:null,patrimonio:null,moneda:"COP"},informacion_matricula_constitucion:{matricula_numero:null,fecha_matricula:null,fecha_constitucion:null,tipo_documento_constitucion:null,numero_documento:null,entidad_otorgante:null,municipio_origen:null,codigo_dane_origen:null,numero_inscripcion:null,libro_inscripcion:null,fecha_inscripcion:null,descripcion:null,aclaratoria_constitucion:{tipo_documento:null,numero_documento:null,fecha_documento:null,entidad_otorgante:null,municipio_origen:null,codigo_dane_origen:null,numero_inscripcion:null,libro_inscripcion:null,fecha_inscripcion:null,descripcion:null}},informacion_renovacion:{ultimo_anio_renovado:null,fecha_renovacion:null},informacion_ubicacion:{direccion_comercial:null,direccion_notificacion_judicial:null,municipio:null,departamento:null,codigo_dane:null,correo_electronico:null,correo_electronico_notificacion:null,telefono_comercial_1:null,telefono_comercial_2:null,telefono_comercial_3:null},termino_duracion:{es_indefinido:null,fecha_vencimiento:null,texto_literal:null},objeto_social:{texto_literal:null},representacion_legal:{texto_literal:null},facultades_representante_legal:{facultades:null,limitaciones:null,prohibiciones:null},historico_reformas:[],reformas_estatutarias:[],capital:{capital_autorizado:{valor:null,numero_acciones:null,valor_nominal:null},capital_suscrito:{valor:null,numero_acciones:null,valor_nominal:null},capital_pagado:{valor:null,numero_acciones:null,valor_nominal:null},capital_social:{valor:null,numero_cuotas:null,valor_cuota:null},valor_nominal_accion:null,numero_acciones:null,notas:null,emision_bonos:null},capital_eats:{aporte_laboral:null,aporte_laboral_adicional:null,aporte_dinero:null,aporte_activos:null},socios:[],representantes_legales:[],junta_directiva:[],revisores_fiscales:[],poderes_apoderados:[],embargos:[],medidas_cautelares:[],procesos_reorganizacion_adjudicacion_liquidacion:[],situaciones_de_control_y_grupos_empresariales:[],clasificacion_ciiu_tamano_empresarial:{actividad_principal:{codigo_ciiu:null,descripcion:null},actividad_secundaria:{codigo_ciiu:null,descripcion:null},otras_actividades:[],tamano_empresarial:null,grupo_niif:null,ingresos_actividad_ordinaria:null},establecimientos_sucursales_agencias:[],propietarios:[],recursos_actos_inscripcion:{recurso_en_curso:null,detalle:null},_alertas:[]};}
-function bloqueCapital(T,etiqueta){const re=new RegExp("CAPITAL\\s+"+etiqueta+"\\s*\\*?([\\s\\S]{0,240})","i");const m=T.match(re);if(!m)return{valor:null,numero_acciones:null,valor_nominal:null};const b=m[1];const v=b.match(/Valor\s*:?\s*\$?\s*([\d.,]+)/i);const a=b.match(/No\.?\s*de\s*acciones\s*:?\s*([\d.,]+)/i);const vn=b.match(/Valor\s*nominal\s*:?\s*\$?\s*([\d.,]+)/i);return{valor:v?num(v[1]):null,numero_acciones:a?num(a[1]):null,valor_nominal:vn?num(vn[1]):null};}
-function parse(text,archivo){
-  const raw=text.replace(/\u00a0/g," ");const j=plantilla();j.archivo_fuente=archivo||null;const tipo=tipoCert(raw);
-  j.metadata_certificado.camara_comercio=/CAMARA DE COMERCIO DE BOGOTA/i.test(sinAcentos(raw).toUpperCase())?"CAMARA DE COMERCIO DE BOGOTA":null;
-  j.metadata_certificado.tipo_certificado=(raw.match(/CERTIFICADO DE [A-ZÁÉÍÓÚÑ ]+/)||[])[0]?.trim().replace(/\s+/g," ")||null;
-  const fe=raw.match(/Fecha Expedici[oó]n:\s*([^\n]+?)\s*Hora:\s*([\d:]+)/i);if(fe){j.metadata_certificado.fecha_expedicion=fecha(fe[1]);j.metadata_certificado.hora_expedicion=fe[2];}
-  j.metadata_certificado.recibo_numero=(raw.match(/Recibo No\.?\s*(\d+)/i)||[])[1]||null;
-  j.metadata_certificado.codigo_verificacion=(raw.match(/C[OÓ]DIGO DE VERIFICACI[OÓ]N\s*([A-Z0-9]+)/i)||[])[1]||null;
-  if(/destino a autoridad competente/i.test(raw))j.metadata_certificado.destino="AUTORIDAD COMPETENTE";
-  if(/Firma mec[aá]nica/i.test(raw))j.metadata_certificado.firmante.tipo_firma="MECANICA";
-  const T=raw.replace(/C[áa]mara de Comercio de Bogot[áa]\s+Departamento De Registros[\s\S]*?-{25,}\s*/gi,"\n").replace(/P[áa]gina\s+\d+\s+de\s+\d+/gi," ");
-  const rs=T.match(/Raz[oó]n social:\s*([^\n]+)/i)||T.match(/Nombre:\s*([^\n]+)/i);const dm=j.datos_matriculado;dm.nombre=clean(rs?rs[1]:null);
-  const nit=T.match(/Nit:\s*([\d]{5,12})\s*[- ]?\s*(\d)?/i);if(nit){dm.nit=nit[2]?`${nit[1]}-${nit[2]}`:nit[1];dm.clase_identificacion="NIT";}
-  const mat=T.match(/Matr[ií]cula No\.?\s*([0-9]{4,10})/i);const matNum=mat?mat[1].padStart(8,"0"):null;dm.matricula_numero=matNum;j.informacion_matricula_constitucion.matricula_numero=matNum;
-  const fm=T.match(/Fecha de matr[ií]cula:\s*([^\n]+)/i);if(fm)j.informacion_matricula_constitucion.fecha_matricula=fecha(fm[1]);
-  const uar=T.match(/[UÚ]ltimo a[ñn]o renovado:\s*(\d{4})/i);if(uar)j.informacion_renovacion.ultimo_anio_renovado=parseInt(uar[1],10);
-  const fr=T.match(/Fecha de renovaci[oó]n:\s*([^\n]+)/i);if(fr)j.informacion_renovacion.fecha_renovacion=fecha(fr[1]);
-  const niif=T.match(/Grupo NIIF:\s*Grupo\s+([IVX]+)/i);if(niif)j.clasificacion_ciiu_tamano_empresarial.grupo_niif=NIIF[niif[1].toLowerCase()]||null;
-  if(tipo==="EXISTENCIA"||tipo==="ESADL")dm.tipo_registro=tipo==="ESADL"?"ENTIDAD SIN ANIMO DE LUCRO":"SOCIEDAD";else if(tipo==="ESTABLECIMIENTO")dm.tipo_registro="ESTABLECIMIENTO DE COMERCIO";else if(tipo==="PERSONA_NATURAL")dm.tipo_registro="PERSONA NATURAL";
-  const nom=(dm.nombre||"");if(/\bS\.?A\.?S\b|SOCIEDAD POR ACCIONES/i.test(nom)){dm.tipo_sociedad="SOCIEDAD POR ACCIONES SIMPLIFICADA";dm.codigo_tipo_sociedad="16";}else if(/\bS\.?A\.?\b/.test(nom)){dm.tipo_sociedad="SOCIEDAD ANONIMA";dm.codigo_tipo_sociedad="04";}else if(/\bLTDA|LIMITADA\b/i.test(nom)){dm.tipo_sociedad="SOCIEDAD LIMITADA";dm.codigo_tipo_sociedad="03";}
-  if(/MATRICULA CANCELADA|matr[ií]cula.*cancel/i.test(T))dm.estado="MATRICULA CANCELADA";else if(/EN LIQUIDACI[OÓ]N/i.test(nom)||/EN LIQUIDACI[OÓ]N/i.test(T))dm.estado="EN LIQUIDACION";
-  const U=j.informacion_ubicacion;
-  U.direccion_comercial=clean((T.match(/Direcci[oó]n del domicilio principal:\s*([^\n]+)/i)||T.match(/Direcci[oó]n comercial:\s*([^\n]+)/i)||T.match(/Direcci[oó]n:\s*([^\n]+)/i)||[])[1]);
-  U.direccion_notificacion_judicial=clean((T.match(/Direcci[oó]n para notificaci[oó]n judicial:\s*([^\n]+)/i)||[])[1]);
-  const mun=clean((T.match(/Domicilio principal:\s*([^\n]+)/i)||T.match(/Municipio:\s*([^\n]+)/i)||[])[1]);
-  if(mun){U.municipio=mun.replace(/\s*\(.*/,"").toUpperCase();const dep=mun.match(/\(([^)]+)\)/);if(dep)U.departamento=dep[1].toUpperCase();U.codigo_dane=daneOf(mun);}
-  U.correo_electronico=(T.match(/Correo electr[oó]nico:\s*([^\s]+@[^\s]+)/i)||[])[1]||null;
-  U.correo_electronico_notificacion=(T.match(/notificaci[oó]n:\s*\n?\s*([^\s]+@[^\s]+)/i)||[])[1]||null;
-  for(const tm of T.matchAll(/Tel[eé]fono comercial\s*(\d):\s*([^\n]+)/gi)){const v=/no report/i.test(tm[2])?null:clean(tm[2]);U["telefono_comercial_"+tm[1]]=v;}
-  const con=T.match(/CONSTITUCI[OÓ]N\s*([\s\S]{0,500}?)(?=T[EÉ]RMINO DE DURACI|OBJETO SOCIAL|Pagina)/i);
-  if(con){const c=con[1].replace(/\s+/g," ").trim();const ci=j.informacion_matricula_constitucion;const doc=c.match(/Por\s+([A-Za-zÁÉÍÓÚ]+(?:\s+[A-Za-zÁÉÍÓÚ]+){0,2}?)\s+del?\s+(\d{1,2}\s+de\s+[a-zá-ú]+\s+de\s+\d{4})/i);if(doc){ci.tipo_documento_constitucion=clean(doc[1]).toUpperCase();ci.fecha_constitucion=fecha(doc[2]);}const ins=c.match(/inscrit[oa][^0-9]*?(\d{1,2}\s+de\s+[a-zá-ú]+\s+de\s+\d{4})[^0-9]*?No\.?\s*(\d+)\s*del\s+Libro\s*([IVX0-9]+)/i);if(ins){ci.fecha_inscripcion=fecha(ins[1]);ci.numero_inscripcion=ins[2];ci.libro_inscripcion=romanToNum(ins[3]);}const ent=c.match(/de\s+(Asamblea de Accionistas|Junta de Socios|Junta Directiva|Accionista [UÚ]nico)/i);if(ent)ci.entidad_otorgante=clean(ent[1]);ci.descripcion=clean(c);}
-  if(/duraci[oó]n es indefinida|duraci[oó]n.*indefinida/i.test(T))j.termino_duracion.es_indefinido=true;
-  const durTxt=T.match(/(La persona jur[ií]dica no se encuentra disuelta[^.]*\.)/i);if(durTxt)j.termino_duracion.texto_literal=clean(durTxt[1]);
-  const obj=T.match(/OBJETO SOCIAL\s*([\s\S]{0,1500}?)(?=CAPITAL|REPRESENTACI[OÓ]N LEGAL|Pagina)/i);if(obj)j.objeto_social.texto_literal=clean(obj[1]);
-  if(tipo==="EXISTENCIA"){j.capital.capital_autorizado=bloqueCapital(T,"AUTORIZADO");j.capital.capital_suscrito=bloqueCapital(T,"SUSCRITO");j.capital.capital_pagado=bloqueCapital(T,"PAGADO");j.capital.valor_nominal_accion=j.capital.capital_autorizado.valor_nominal;j.capital.numero_acciones=j.capital.capital_autorizado.numero_acciones;const cs=T.match(/CAPITAL SOCIAL\s*\*?\s*Valor\s*:?\s*\$?\s*([\d.,]+)/i);if(cs)j.capital.capital_social.valor=num(cs[1]);}
-  const rl=T.match(/REPRESENTACI[OÓ]N LEGAL\s*([\s\S]{0,600}?)(?=FACULTADES|NOMBRAMIENTOS|Pagina)/i);if(rl)j.representacion_legal.texto_literal=clean(rl[1]);
-  const fac=T.match(/FACULTADES Y LIMITACIONES[^\n]*\n([\s\S]{0,800}?)(?=NOMBRAMIENTOS|RECURSOS|Pagina)/i);if(fac)j.facultades_representante_legal.facultades=clean(fac[1]);
-  const nb=T.match(/NOMBRAMIENTOS([\s\S]*?)(?=RECURSOS CONTRA|REVISOR|CLASIFICACI[OÓ]N DE ACTIVIDADES|ESTABLECIMIENTO\(S\)|$)/i);
-  if(nb){const nf=nb[1].replace(/\s+/g," ");const reps=[...nf.matchAll(/(Representante|Gerente|Presidente|Liquidador|Subgerente)\s+([A-ZÁÉÍÓÚÑ][a-zA-ZÁÉÍÓÚÑáéíóúñ.]+(?:\s+[A-ZÁÉÍÓÚÑ][a-zA-ZÁÉÍÓÚÑáéíóúñ.]+){0,3}?)\s+C\.?C\.?\s*No\.?\s*(\d{4,12})(?:\s+(Legal(?:\s+Suplente)?|Suplente)\s+([A-ZÁÉÍÓÚÑ][a-zA-ZÁÉÍÓÚÑáéíóúñ]+))?/gi)];const vistos=new Set();for(const r of reps){if(vistos.has(r[3]))continue;vistos.add(r[3]);let cargo=r[1];if(r[4])cargo+=" "+r[4].replace(/^Legal\s*/i,"Legal ");cargo=cargo.replace(/\s+/g," ").trim();if(/^Representante$/i.test(cargo))cargo="Representante Legal";let nc=clean(r[2]);if(r[5])nc=nc+" "+r[5];const pn=partirNombre(nc);j.representantes_legales.push({calidad:cargo,tipo_calidad:/suplente/i.test(cargo)?"SUPLENTE":"PRINCIPAL",nombre_completo:nc,...pn,genero:null,clase_identificacion:"CC",numero_identificacion:r[3],documento_nombramiento:{tipo_documento:null,numero_documento:null,fecha_documento:null,entidad_otorga:null,municipio_origen:null,codigo_dane_origen:null,numero_inscripcion:null,fecha_inscripcion:null,libro_inscripcion:null}});}if(!j.representantes_legales.length&&/C\.?C\.?\s*No/i.test(nf))j._alertas.push("Nombramientos presentes pero no se pudieron estructurar automaticamente; revisar representantes legales.");}
-  const cp=T.match(/Actividad principal C[oó]digo CIIU:\s*(\d{3,4})/i);if(cp)j.clasificacion_ciiu_tamano_empresarial.actividad_principal.codigo_ciiu=cp[1];
-  const csec=T.match(/Actividad secundaria C[oó]digo CIIU:\s*(\d{3,4})/i);if(csec)j.clasificacion_ciiu_tamano_empresarial.actividad_secundaria.codigo_ciiu=csec[1];
-  const tam=T.match(/tama[ñn]o\s+de\s+la\s+empresa\s+es\s+([A-Za-zñÑáéíóú]+)/i);if(tam)j.clasificacion_ciiu_tamano_empresarial.tamano_empresarial=clean(tam[1]);
-  const ing=T.match(/Ingresos por actividad ordinaria\s*\$?\s*([\d.,]+)/i);if(ing)j.clasificacion_ciiu_tamano_empresarial.ingresos_actividad_ordinaria=num(ing[1]);
-  const estBloque=T.match(/ESTABLECIMIENTO\(S\) DE COMERCIO([\s\S]*?)(?=SI DESEA OBTENER|TAMA[ÑN]O EMPRESARIAL|Pagina)/i);
-  if(estBloque){for(const e of estBloque[1].matchAll(/Nombre:\s*([^\n]+)[\s\S]*?Matr[ií]cula No\.?:\s*(\d{4,10})[\s\S]*?Municipio:\s*([^\n]+)/gi)){const municip=clean(e[3]);j.establecimientos_sucursales_agencias.push({tipo:"ESTABLECIMIENTO DE COMERCIO",nombre:clean(e[1]),matricula_numero:e[2].padStart(8,"0"),municipio:municip,codigo_dane:daneOf(municip),embargos:[]});}}
-  if(/NO se encuentra\s*en curso ning[uú]n recurso/i.test(T))j.recursos_actos_inscripcion.recurso_en_curso=false;
-  if(tipo==="ESADL"){const patr=T.match(/PATRIMONIO[^\d]*\$?\s*([\d.,]+)/i);if(patr)dm.patrimonio=num(patr[1]);const vig=T.match(/(?:ENTIDAD QUE EJERCE (?:LA )?(?:INSPECCI[OÓ]N|VIGILANCIA)[^:]*:|VIGILADA POR)\s*([^\n]+)/i);if(vig)dm.vigilancia_y_control=clean(vig[1]);}
-  return {json:j,tipo,matricula:matNum};
-}
-
-/* ===== UI ===== */
-const drop=document.getElementById('drop'),file=document.getElementById('file'),lista=document.getElementById('lista'),panel=document.getElementById('panel');
-let resultados=[];
-drop.onclick=()=>file.click();
-file.onchange=e=>handle(e.target.files);
-['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
-['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
-drop.addEventListener('drop',e=>handle(e.dataTransfer.files));
-
-async function handle(files){
-  for(const f of files){
-    if(!f.name.toLowerCase().endsWith('.pdf'))continue;
-    const idx=resultados.length;resultados.push({nombre:f.name,estado:'procesando'});render();
-    try{
-      const buf=new Uint8Array(await f.arrayBuffer());
-      const T=await pdfATexto(buf);
-      const {json,tipo,matricula}=parse(T,f.name);
-      const code=(f.name.match(/(\d{4,10})/)||[])[1];
-      if(code&&matricula&&code.replace(/^0+/,'')!==matricula.replace(/^0+/,''))json._alertas.push("El nombre del archivo ("+code+") NO coincide con la matrícula interna ("+matricula.replace(/^0+/,'')+"). Posible archivo mal etiquetado.");
-      if(tipo==='OTRO')json._alertas.push("Tipo de certificado no reconocido con certeza; revisar el JSON.");
-      resultados[idx]={nombre:f.name,estado:json._alertas.length?'warn':'ok',tipo,matricula,json};
-    }catch(err){resultados[idx]={nombre:f.name,estado:'err',error:err.message};}
-    render();
+  window.addEventListener('error', e=>mostrarAviso('Error: '+(e.message||e.error), true));
+  window.addEventListener('unhandledrejection', e=>mostrarAviso('Error: '+((e.reason&&e.reason.message)||e.reason), true));
+  function mostrarAviso(txt, malo){
+    const d=document.getElementById('avisos');
+    d.insertAdjacentHTML('afterbegin','<div class="alert'+(malo?' bad':'')+'">'+String(txt).replace(/</g,'&lt;')+'</div>');
   }
+</script>
+
+<script type="module">
+import { pdfATexto } from "./texto.js";
+import { normalizar, cobertura } from "./canonico.js";
+import { extraerCertificado, costoUSD, MODELOS, cargarReglas } from "./extractor-llm.js";
+import { parse as parseLocal } from "./parser-local.js";
+import { crearZip } from "./zip.js";
+
+const $ = (id) => document.getElementById(id);
+const drop=$('drop'), file=$('file'), lista=$('lista'), panel=$('panel');
+const inKey=$('key'), inModelo=$('modelo'), inParalelo=$('paralelo'), inAuditar=$('auditar'), inBorrador=$('borrador');
+
+for (const [id, m] of Object.entries(MODELOS)) {
+  const o = document.createElement('option');
+  o.value = id; o.textContent = m.etiqueta;
+  inModelo.appendChild(o);
 }
+
+// --- preferencias locales ---
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch {} },
+};
+inKey.value      = LS.get('ccb_api_key','');
+inModelo.value   = LS.get('ccb_modelo','claude-opus-5');
+inParalelo.value = LS.get('ccb_paralelo','3');
+inAuditar.checked  = LS.get('ccb_auditar','1') === '1';
+inBorrador.checked = LS.get('ccb_borrador','0') === '1';
+inKey.onchange      = () => LS.set('ccb_api_key', inKey.value.trim());
+inModelo.onchange   = () => LS.set('ccb_modelo', inModelo.value);
+inParalelo.onchange = () => LS.set('ccb_paralelo', inParalelo.value);
+inAuditar.onchange  = () => LS.set('ccb_auditar', inAuditar.checked ? '1' : '0');
+inBorrador.onchange = () => { LS.set('ccb_borrador', inBorrador.checked ? '1' : '0'); pintarModo(); };
+
+function pintarModo(){
+  const b = inBorrador.checked;
+  inKey.disabled = b; inModelo.disabled = b; inAuditar.disabled = b;
+  drop.firstChild.textContent = b ? 'Modo borrador — arrastra aquí los ' : 'Arrastra aquí los ';
+}
+pintarModo();
+
+// precarga las reglas para fallar temprano si el despliegue quedó incompleto
+cargarReglas().catch(e => mostrarAviso(e.message, true));
+
+// --- estado ---
+let resultados = [];
+const totales = { entrada: 0, salida: 0, usd: 0 };
+
+drop.onclick = () => file.click();
+file.onchange = e => encolar(e.target.files);
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', e => encolar(e.dataTransfer.files));
+
+async function encolar(files){
+  const pdfs = [...files].filter(f => f.name.toLowerCase().endsWith('.pdf'));
+  if (!pdfs.length) return;
+  if (!inBorrador.checked && !inKey.value.trim()) {
+    mostrarAviso('Escribe tu clave de API de Anthropic, o marca "Modo borrador" para usar solo las reglas locales.', true);
+    return;
+  }
+  LS.set('ccb_api_key', inKey.value.trim());
+
+  const nuevos = pdfs.map(f => {
+    const idx = resultados.length;
+    resultados.push({ nombre: f.name, estado: 'espera', detalle: 'en cola', archivo: f });
+    return idx;
+  });
+  render();
+
+  const n = parseInt(inParalelo.value, 10) || 3;
+  const cola = nuevos.slice();
+  const obreros = Array.from({ length: Math.min(n, cola.length) }, async () => {
+    while (cola.length) await procesar(cola.shift());
+  });
+  await Promise.all(obreros);
+}
+
+async function procesar(idx){
+  const r = resultados[idx];
+  const set = (estado, detalle) => { r.estado = estado; r.detalle = detalle; render(); };
+  set('run', 'leyendo el PDF');
+  try {
+    const buf = new Uint8Array(await r.archivo.arrayBuffer());
+    const texto = await pdfATexto(buf);
+    r.texto = texto;
+    if (!texto.replace(/\s/g,'').length) throw new Error('El PDF no tiene texto (parece escaneado): requiere OCR previo.');
+
+    let json, uso = null, cob;
+    if (inBorrador.checked) {
+      set('run', 'aplicando reglas locales');
+      const out = parseLocal(texto, r.archivo.name);
+      const crudo = out.json || out;
+      delete crudo._alertas;
+      json = normalizar(crudo);
+      cob = cobertura(json);
+    } else {
+      const res = await extraerCertificado({
+        apiKey: inKey.value.trim(),
+        texto,
+        archivo: r.archivo.name,
+        modelo: inModelo.value,
+        auditar: inAuditar.checked,
+        onEstado: (t) => set('run', t),
+      });
+      json = res.json; uso = res.uso; cob = res.cobertura;
+      totales.entrada += uso.entrada;
+      totales.salida  += uso.salida;
+      totales.usd     += costoUSD(uso, inModelo.value);
+    }
+
+    r.json = json;
+    r.cobertura = cob;
+    r.matricula = json.datos_matriculado.matricula_numero;
+    r.tipo = json.metadata_certificado.tipo_certificado || json.datos_matriculado.tipo_registro || '';
+    r.avisos = revisar(r, json);
+    r.estado = r.avisos.length ? 'warn' : 'ok';
+    r.detalle = resumen(json, cob) + (inBorrador.checked ? ' · BORRADOR' : '');
+  } catch (e) {
+    r.estado = 'err';
+    r.detalle = e.message;
+  }
+  render();
+}
+
+function resumen(json, cob){
+  const partes = [];
+  if (json.datos_matriculado.matricula_numero) partes.push('matrícula ' + json.datos_matriculado.matricula_numero);
+  const filas =
+    json.historico_reformas.length + json.reformas_estatutarias.length + json.socios.length +
+    json.representantes_legales.length + json.junta_directiva.length + json.revisores_fiscales.length +
+    json.poderes_apoderados.length + json.embargos.length + json.medidas_cautelares.length +
+    json.procesos_reorganizacion_adjudicacion_liquidacion.length +
+    json.situaciones_de_control_y_grupos_empresariales.length +
+    json.establecimientos_sucursales_agencias.length + json.propietarios.length;
+  partes.push(cob.con_dato + ' campos con dato');
+  partes.push(filas + ' registros');
+  return partes.join(' · ');
+}
+
+/** Chequeos de coherencia sobre el JSON ya canónico. No modifica nada. */
+function revisar(r, json){
+  const av = [];
+  const codigo = (r.archivo.name.match(/(\d{4,10})/) || [])[1];
+  const mat = json.datos_matriculado.matricula_numero;
+  if (codigo && mat && codigo.replace(/^0+/,'') !== String(mat).replace(/^S/i,'').replace(/^0+/,'')) {
+    av.push('El nombre del archivo (' + codigo + ') NO coincide con la matrícula interna (' + mat + '). El JSON usa la matrícula real del certificado.');
+  }
+  if (!json.datos_matriculado.nombre) av.push('No se identificó el nombre del matriculado.');
+  if (!mat) av.push('No se identificó la matrícula.');
+  const esSociedad = /SOCIEDAD|SAS|LTDA|ANONIMA|COMANDITA|EMPRESA/i.test(String(json.datos_matriculado.tipo_registro || '') + ' ' + String(json.datos_matriculado.tipo_sociedad || ''));
+  const capVacio = !json.capital.capital_autorizado.valor && !json.capital.capital_social.valor && !json.capital_eats.aporte_laboral;
+  if (esSociedad && capVacio) av.push('Sociedad sin capital extraído: verificar si el certificado lo reporta (regla 40).');
+  if (esSociedad && !json.representantes_legales.length) av.push('Sociedad sin representantes legales: verificar la sección de nombramientos.');
+  if (!json.metadata_certificado.tipo_certificado) av.push('No se identificó el tipo de certificado.');
+  return av;
+}
+
+function nombreSalida(r){
+  const mat = r.json && r.json.datos_matriculado.matricula_numero;
+  if (!mat) return 'CER-sin_matricula.json';
+  const s = String(mat);
+  return /^S/i.test(s) ? 'CER-' + s.toUpperCase() + '.json'    // ESADL: matrícula S, sin quitar ceros
+                       : 'CER-' + s.replace(/^0+/, '') + '.json'; // REGMER: nombre sin ceros
+}
+
 function render(){
-  if(!resultados.length){lista.innerHTML='<p class="muted">Aún no has cargado certificados.</p>';return;}
-  lista.innerHTML='<div class="btns"><button onclick="window.__todo()">Descargar todos</button><button class="sec" onclick="window.__limpiar()">Limpiar</button></div>'+
-    resultados.map((r,i)=>`<div class="item ${r.estado}"><div><div class="n">${r.nombre}</div><div class="s">${r.estado==='procesando'?'procesando…':r.estado==='err'?('error: '+r.error):('matrícula '+(r.matricula||'?')+' · '+(r.tipo||''))}</div></div>${r.json?`<button onclick="window.__ver(${i})">Ver / Descargar</button>`:''}</div>`).join('');
+  if (!resultados.length) { lista.innerHTML = '<p class="muted">Aún no has cargado certificados.</p>'; return; }
+  const hechos = resultados.filter(r => r.json).length;
+  const enCurso = resultados.some(r => r.estado === 'run' || r.estado === 'espera');
+  lista.innerHTML =
+    '<div class="btns">' +
+      '<button id="bzip"' + (hechos ? '' : ' disabled') + '>Descargar ZIP (' + hechos + ')</button>' +
+      '<button class="sec" id="blimpiar">Limpiar</button>' +
+      '<span class="tot">' + (totales.usd ? 'costo API: <b>US$ ' + totales.usd.toFixed(3) + '</b> · ' : '') +
+        (totales.salida ? (totales.entrada/1000).toFixed(0) + 'k in / ' + (totales.salida/1000).toFixed(0) + 'k out' : '') +
+      '</span>' +
+    '</div>' +
+    resultados.map((r,i) =>
+      '<div class="item ' + r.estado + '">' +
+        '<div><div class="n">' + esc(r.nombre) + '</div><div class="s">' + esc(r.detalle || '') + '</div></div>' +
+        (r.json ? '<button data-ver="' + i + '">Ver / Descargar</button>' : '') +
+      '</div>').join('');
+  const bz = $('bzip'); if (bz) bz.onclick = descargarZip;
+  $('blimpiar').onclick = () => { if (enCurso) return; resultados = []; totales.entrada = totales.salida = 0; totales.usd = 0; render(); panel.innerHTML = '<p class="muted">Selecciona un certificado de la lista para ver su JSON.</p>'; };
+  lista.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => ver(+b.dataset.ver));
 }
-function clone(j){const c=JSON.parse(JSON.stringify(j));delete c._alertas;return c;}
-window.__ver=function(i){const r=resultados[i];if(!r.json)return;const al=(r.json._alertas||[]);panel.innerHTML=(al.length?al.map(a=>`<div class="alert">⚠️ ${a}</div>`).join(''):'')+`<div class="btns"><button onclick="window.__desc(${i})">Descargar JSON</button><button class="sec" onclick="window.__copy(${i})">Copiar</button></div>`+`<pre>${JSON.stringify(clone(r.json),null,2).replace(/</g,'&lt;')}</pre>`;}
-window.__desc=function(i){const r=resultados[i];const blob=new Blob([JSON.stringify(clone(r.json),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='CER-'+(r.matricula||'sin_matricula')+'.json';a.click();}
-window.__todo=function(){resultados.forEach((r,i)=>{if(r.json)window.__desc(i)})}
-window.__copy=function(i){navigator.clipboard.writeText(JSON.stringify(clone(resultados[i].json),null,2))}
-window.__limpiar=function(){resultados=[];render();panel.innerHTML='<p class="muted">Selecciona un certificado de la lista para ver su JSON.</p>';}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function ver(i){
+  const r = resultados[i];
+  if (!r.json) return;
+  const cob = r.cobertura;
+  panel.innerHTML =
+    (r.avisos || []).map(a => '<div class="alert">⚠️ ' + esc(a) + '</div>').join('') +
+    (cob.grupos_vacios.length ? '<div class="alert">Grupos vacíos: ' + esc(cob.grupos_vacios.join(', ')) + '</div>' : '') +
+    '<div class="btns"><button data-desc="' + i + '">Descargar ' + nombreSalida(r) + '</button>' +
+      '<button class="sec" data-copy="' + i + '">Copiar</button>' +
+      '<button class="sec" data-txt="' + i + '">Ver texto del PDF</button></div>' +
+    '<pre>' + esc(JSON.stringify(r.json, null, 2)) + '</pre>';
+  panel.querySelector('[data-desc]').onclick = () => descargar(nombreSalida(r), JSON.stringify(r.json, null, 2), 'application/json');
+  panel.querySelector('[data-copy]').onclick = () => navigator.clipboard.writeText(JSON.stringify(r.json, null, 2));
+  panel.querySelector('[data-txt]').onclick  = () => { panel.innerHTML = '<div class="btns"><button data-vol="' + i + '">Volver al JSON</button></div><pre>' + esc(r.texto || '') + '</pre>'; panel.querySelector('[data-vol]').onclick = () => ver(i); };
+}
+
+function descargar(nombre, contenido, tipo){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([contenido], { type: tipo }));
+  a.download = nombre;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function descargarZip(){
+  const archivos = resultados.filter(r => r.json)
+    .map(r => ({ nombre: nombreSalida(r), contenido: JSON.stringify(r.json, null, 2) }));
+  if (!archivos.length) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(crearZip(archivos));
+  a.download = 'certificados_json.zip';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 8000);
+}
+
+render();
 </script>
 </body>
 </html>
